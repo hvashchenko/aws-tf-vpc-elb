@@ -1,0 +1,21 @@
+<powershell>
+Get-Module -Name PowerShellGet
+Install-Package -Name AWSPowerShell -Force
+Get-AWSCmdletName -Service S3
+
+$accessKey = "*****"
+$secretKey = "*****"
+$region = "us-east-2"
+$bucket = "indexbuckethtml"
+Set-AWSCredentials -AccessKey $accessKey -SecretKey $secretKey -StoreAs default
+Copy-S3Object -BucketName $bucket  -Folder c:\Build\ -Key index.html
+Remove-AWSCredentialProfile -ProfileName default -Force
+Install-WindowsFeature -name Web-Server -IncludeManagementTools
+netsh firewall add portopening TCP 8080 IISExpressWeb enable ALL
+Import-Module IISAdministration
+New-IISSite -Name "Website1" -BindingInformation "*:8080:" -PhysicalPath "C:\Build"
+
+$password =  ConvertTo-SecureString  -AsPlainText "1679435Qq" -Force
+New-LocalUser "User05" -Password $password -FullName "Third User" -Description "Description of this account."
+Add-LocalGroupMember -Group "Administrators" -Member "User05"
+</powershell>
